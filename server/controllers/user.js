@@ -14,6 +14,14 @@ exports.list = async (req, res, next) => {
     // console.log('UserModel list:', ret)
     console.log('UserModel list:', ret.toJSON)
     // console.log(ret.get({ plain: true })) // 获取干净的 JSON 对象
+
+    // 手机号脱敏
+    ret.forEach(item => {
+      if (item.phone) {
+        item.phone = item.phone.substr(0, 3) + '****' + item.phone.substr(7)
+      }
+    })
+
     res.status(200).json(ret)
   } catch (error) {
     console.log('UserModel list error:', error)
@@ -37,7 +45,7 @@ exports.update = async (req, res, next) => {
   try {
     // const ret = await UserModel.findByPk(req.params.id)
     const ret = await UserModel.findOne({
-      where: { id: req.params.id }
+      where: { id: req.body.id }
     })
 
     if (ret === null) {
@@ -65,7 +73,7 @@ exports.delete = async (req, res, next) => {
     const ret = await UserModel.findOne({
       where: {
         id: {
-          [Op.eq]: req.params.id
+          [Op.eq]: req.body.id
         }
       }
     })
@@ -76,9 +84,9 @@ exports.delete = async (req, res, next) => {
       return
     }
 
-    await ret.destroy() // 物理删除
-    // ret.status = 0 // 逻辑删除
-    // await ret.save()
+    // await ret.destroy() // 物理删除
+    ret.status = 0 // 逻辑软删除
+    await ret.save()
 
     console.log('UserModel delete:', ret)
     res.status(204).json(ret)

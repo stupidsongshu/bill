@@ -24,11 +24,11 @@ const sequelize = new Sequelize(dbname, username, password, {
      * 这意味着直接 SQL 查询(例如,通过任何其他方式在不使用 Sequelize 的情况下执行的查询)将不会导致这些字段自动更新.
      */
     timestamps: true,
-    paranoid: true, // 设置 paranoid 为 true 后，destroy() 删除数据时不会进行物理删除(但通过 destroy({ force: true }) 仍然可以物理删除)，而是设置 deletedAt 为当前时间
+    underscored: true, // 字段以下划线（_）来分割（默认是驼峰命名风格）
+    // paranoid: true, // 设置 paranoid 为 true 后，destroy() 删除数据时不会进行物理删除(但通过 destroy({ force: true }) 仍然可以物理删除)，而是设置 deletedAt 为当前时间
     createdAt: 'create_time',
     updatedAt: 'update_time',
-    deletedAt: 'delete_time',
-    underscored: true, // 字段以下划线（_）来分割（默认是驼峰命名风格）
+    deletedAt: false,
   }
 })
 

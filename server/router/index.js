@@ -9,7 +9,7 @@ const router = express.Router()
 
 router.get('/user', userCtrl.list)
   .post('/user', userCtrl.create)
-  .put('/user/:id', userCtrl.update)
-  .delete('/user/:id', userCtrl.delete)
+  .put('/user', userCtrl.update)
+  .delete('/user', userCtrl.delete)
 
 module.exports = router
