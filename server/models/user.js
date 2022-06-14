@@ -30,13 +30,15 @@ const { DataTypes, Model } = require('sequelize')
 //     comment: '邮箱'
 //   },
 //   // create_time: {
-//   //   type: DataTypes.STRING(255),
+//   //   type: DataTypes.DATE,
 //   //   allowNull: false,
+//   //   defaultValue: DataTypes.NOW,
 //   //   comment: '创建时间'
 //   // },
 //   // update_time: {
-//   //   type: DataTypes.STRING(255),
+//   //   type: DataTypes.DATE,
 //   //   allowNull: false,
+//   //   defaultValue: DataTypes.NOW,
 //   //   comment: '更新时间'
 //   // },
 //   status: {
@@ -105,13 +107,15 @@ module.exports = (sequelize) => {
       comment: '邮箱'
     },
     // create_time: {
-    //   type: DataTypes.STRING(255),
+    //   type: DataTypes.DATE,
     //   allowNull: false,
+    //   defaultValue: DataTypes.NOW,
     //   comment: '创建时间'
     // },
     // update_time: {
-    //   type: DataTypes.STRING(255),
+    //   type: DataTypes.DATE,
     //   allowNull: false,
+    //   defaultValue: DataTypes.NOW,
     //   comment: '更新时间'
     // },
     status: {
