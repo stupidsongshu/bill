@@ -21,7 +21,6 @@ module.exports = (sequelize) => {
     }
   }, {
     sequelize,
-    freezeTableName: true,
     tableName: 't_category',
   })
 }

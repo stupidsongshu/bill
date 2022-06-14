@@ -23,7 +23,6 @@ module.exports = (sequelize) => {
     }
   }, {
     sequelize,
-    freezeTableName: true,
     tableName: 't_account',
     indexes: [
       { unique: true, fields: ['phone'] },

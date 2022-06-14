@@ -1,8 +1,10 @@
 const  { Op } = require('sequelize')
 const { UserModel } = require('../models')
+const UserService = require('../services/userService')
 
 exports.list = async (req, res, next) => {
   try {
+    // const ret = await UserService.getAll({
     const ret = await UserModel.findAll({
       where: {
         status: 1
@@ -12,8 +14,9 @@ exports.list = async (req, res, next) => {
       }
     })
     // console.log('UserModel list:', ret)
-    console.log('UserModel list:', ret.toJSON)
+    // console.log('UserModel list:', ret.toJSON)
     // console.log(ret.get({ plain: true })) // 获取干净的 JSON 对象
+    console.log('UserModel list:',  JSON.stringify(ret, null, 4))
 
     // 手机号脱敏
     ret.forEach(item => {
@@ -25,6 +28,33 @@ exports.list = async (req, res, next) => {
     res.status(200).json(ret)
   } catch (error) {
     console.log('UserModel list error:', error)
+    next(error)
+  }
+}
+
+exports.save = async (req, res, next) =>{
+  try {
+    // let where = {}
+    // if (req.body.id) {
+    //   where.id = req.body.id
+    // }
+    // if (req.body.phone) {
+    //   where.phone = req.body.phone
+    // }
+
+    const where = []
+    const keys = ['id', 'phone']
+    keys.forEach(key => {
+      if (key in req.body) {
+        where.push({ key, val: req.body[key] })
+      }
+    })
+
+    const ret = await UserService.save(where, req.body)
+    console.log('UserModel save:', JSON.stringify(ret, null, 4))
+    res.status(200).json(ret)
+  } catch (error) {
+    console.log('UserModel save error:', error)
     next(error)
   }
 }

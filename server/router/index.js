@@ -13,10 +13,10 @@ const router = express.Router()
 //   .delete('/user/:id', userCtrl.delete)
 
 router
-  .post('/user/all', userCtrl.all)
+  // .post('/user/all', userCtrl.all)
   .post('/user/list', userCtrl.list)
   .post('/user/save', userCtrl.save)
-  .post('/user/detail', userCtrl.detail)
+  // .post('/user/detail', userCtrl.detail)
   // .post('/user', userCtrl.delete)
 
 module.exports = router

@@ -62,7 +62,6 @@ module.exports = (sequelize) => {
     }
   }, {
     sequelize,
-    freezeTableName: true,
     tableName: 't_bill',
   })
 }

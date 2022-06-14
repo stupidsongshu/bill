@@ -1,11 +1,12 @@
 const { Sequelize, DataTypes } = require('sequelize')
-const { dialect, dbname, username, password, host, port } = require('../config/database')
+const { dialect, database, username, password, host, port } = require('../config/database')
 
 // sequelize 学习之路(示例代码)：https://www.136.la/tech/show-380302.html
 
-// const sequelize = new Sequelize(`${dialect}://${username}:${password}@${host}:${port}/${dbname}`)
-const sequelize = new Sequelize(dbname, username, password, {
+// const sequelize = new Sequelize(`${dialect}://${username}:${password}@${host}:${port}/${database}`)
+const sequelize = new Sequelize(database, username, password, {
   dialect,
+  // dialectOptions: {}, // https://www.npmjs.com/package/mysql#connection-options
   host,
   port,
   storage: `${__dirname}/log/database.${dialect}`,
@@ -14,6 +15,8 @@ const sequelize = new Sequelize(dbname, username, password, {
   },
   timezone: '+08:00',
   define: {
+    // 默认情况下,当未提供表名时,Sequelize 会自动将模型名复数并将其用作表名. 
+    freezeTableName: true,
     /**
      * 时间戳：
      * 默认情况下,Sequelize 使用数据类型 DataTypes.DATE 自动向每个模型添加 createdAt 和 updatedAt 字段.
@@ -23,12 +26,12 @@ const sequelize = new Sequelize(dbname, username, password, {
      * 注意： 这是在 Sequelize 级别完成的(即未使用 SQL触发器 完成). 
      * 这意味着直接 SQL 查询(例如,通过任何其他方式在不使用 Sequelize 的情况下执行的查询)将不会导致这些字段自动更新.
      */
-    timestamps: true,
-    underscored: true, // 字段以下划线（_）来分割（默认是驼峰命名风格）
-    // paranoid: true, // 设置 paranoid 为 true 后，destroy() 删除数据时不会进行物理删除(但通过 destroy({ force: true }) 仍然可以物理删除)，而是设置 deletedAt 为当前时间
+    timestamps: true, // 启用时间戳
     createdAt: 'create_time',
     updatedAt: 'update_time',
-    deletedAt: false,
+    deletedAt: false, // 禁用
+    // paranoid: true, // 设置 paranoid 为 true 后，destroy() 删除数据时不会进行物理删除(但通过 destroy({ force: true }) 仍然可以物理删除)，而是设置 deletedAt 为当前时间
+    underscored: true, // 字段以下划线（_）来分割（默认是驼峰命名风格）
   }
 })
 
