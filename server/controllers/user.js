@@ -1,8 +1,32 @@
 const  { Op } = require('sequelize')
 const UserService = require('../services/user')
 const Util = require('../utils')
-const CONST = require('../utils/constant')
+const { PAGE_SIZE } = require('../utils/constant')
 
+// 批量添加 测试数据
+exports.bulkCreate = async (req, res, next) => {
+  const data = []
+  let startNo = 100
+  for (let i = 0; i < 100; i++) {
+    data.push({
+      name: `user_${i}`,
+      password: `pwd_${i}`,
+      phone: `13012345${startNo++}`,
+      email: `google_${i}@gmail.com`
+    })
+  }
+
+  try {
+    const ret = await UserService.bulkCreate(data)
+    console.log('UserModel bulkCreate:',  JSON.stringify(ret, null, 4))
+    Util.success(res, ret)
+  } catch (error) {
+    console.error('UserModel bulkCreate error:', error)
+    next(error)
+  }
+}
+
+// 查询所有
 exports.list = async (req, res, next) => {
   try {
     // const ret = await UserModel.findAll({
@@ -48,10 +72,11 @@ exports.list = async (req, res, next) => {
   }
 }
 
+// 分页查询
 exports.pageList = async (req, res, next) => {
   const { body = {} } = req
   const currentPage = Util.getParam(body, 'currentPage', 1)
-  const pageSize = Util.getParam(body, 'pageSize', CONST.PAGE_SIZE)
+  const pageSize = Util.getParam(body, 'pageSize', PAGE_SIZE)
   const id = Util.getParam(body, 'id', 0)
   const name = Util.getParam(body, 'name', '')
   // const password = Util.getParam(body, 'password', '')
@@ -77,8 +102,8 @@ exports.pageList = async (req, res, next) => {
   }
 
   try {
-    const retCount = await UserService.getCount(where)
-    console.log('UserModel pageList count:', retCount)
+    // const retCount = await UserService.getCount(where)
+    // console.log('UserModel pageList count:', retCount)
     const ret = await UserService.getPageList(where, { exclude: ['password'] }, { currentPage, pageSize })
     console.log('UserModel pageList:', JSON.stringify(ret, null, 4))
     Util.success(res, ret)
@@ -88,6 +113,7 @@ exports.pageList = async (req, res, next) => {
   }
 }
 
+// 新增/修改
 exports.save = async (req, res, next) => {
   const { body = {} } = req
   const id = Util.getParam(body, 'id', 0)
@@ -134,6 +160,7 @@ exports.save = async (req, res, next) => {
   }
 }
 
+// 删除
 exports.delete = async (req, res, next) => {
   const { body = {} } = req
   const id = Util.getParam(body, 'id', 0)
