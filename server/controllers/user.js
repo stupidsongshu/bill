@@ -1,18 +1,31 @@
 const  { Op } = require('sequelize')
-const { UserModel } = require('../models')
-const UserService = require('../services/userService')
+const UserService = require('../services/user')
+const Util = require('../utils')
+const CONST = require('../utils/constant')
 
 exports.list = async (req, res, next) => {
   try {
-    // const ret = await UserService.getAll({
-    const ret = await UserModel.findAll({
-      where: {
+    // const ret = await UserModel.findAll({
+    //   where: {
+    //     status: 1
+    //   },
+    //   attributes: {
+    //     exclude: ['password'] // 排除字段
+    //   }
+    // })
+
+    const ret = await UserService.getList(
+      {
         status: 1
       },
-      attributes: {
+      {
         exclude: ['password'] // 排除字段
-      }
-    })
+      },
+      [
+        ['id', 'desc']
+      ]
+    )
+
     // console.log('UserModel list:', ret)
     // console.log('UserModel list:', ret.toJSON)
     // console.log(ret.get({ plain: true })) // 获取干净的 JSON 对象
@@ -25,103 +38,126 @@ exports.list = async (req, res, next) => {
       }
     })
 
-    res.status(200).json(ret)
-  } catch (error) {
-    console.log('UserModel list error:', error)
-    next(error)
-  }
-}
-
-exports.save = async (req, res, next) =>{
-  try {
-    // let where = {}
-    // if (req.body.id) {
-    //   where.id = req.body.id
-    // }
-    // if (req.body.phone) {
-    //   where.phone = req.body.phone
-    // }
-
-    const where = []
-    const keys = ['id', 'phone']
-    keys.forEach(key => {
-      if (key in req.body) {
-        where.push({ key, val: req.body[key] })
-      }
-    })
-
-    const ret = await UserService.save(where, req.body)
-    console.log('UserModel save:', JSON.stringify(ret, null, 4))
-    res.status(200).json(ret)
-  } catch (error) {
-    console.log('UserModel save error:', error)
-    next(error)
-  }
-}
-
-exports.create = async (req, res, next) => {
-  try {
-    // Sequelize 提供了 create 方法,该方法将 build 方法和 save 方法合并为一个方法
-    const ret = await UserModel.create(req.body)
-    console.log('UserModel create:', ret)
-    res.status(200).json(ret)
-  } catch (error) {
-    console.log('UserModel create error:', error)
-    next(error)
-  }
-}
-
-exports.update = async (req, res, next) => {
-  try {
-    // const ret = await UserModel.findByPk(req.params.id)
-    const ret = await UserModel.findOne({
-      where: { id: req.body.id }
-    })
-
-    if (ret === null) {
-      console.log('UserModel update Not found:', req.params, req.body, ret)
-      res.status(404).json(ret)
-      return
+    if (ret.length > 0) {
+      return Util.success(res, ret)
     }
-
-    // Object.assign(ret, req.body)
-    // await ret.save()
-
-    // 或者
-    await ret.update(req.body)
-
-    console.log('UserModel update:', ret)
-    res.status(201).json(ret)
+    return Util.none(res)
   } catch (error) {
-    console.log('UserModel update error:', error)
+    console.error('UserModel list error:', error)
+    next(error)
+  }
+}
+
+exports.pageList = async (req, res, next) => {
+  const { body = {} } = req
+  const currentPage = Util.getParam(body, 'currentPage', 1)
+  const pageSize = Util.getParam(body, 'pageSize', CONST.PAGE_SIZE)
+  const id = Util.getParam(body, 'id', 0)
+  const name = Util.getParam(body, 'name', '')
+  // const password = Util.getParam(body, 'password', '')
+  const phone = Util.getParam(body, 'phone', null)
+  const email = Util.getParam(body, 'email', null)
+  const status = Util.getParam(body, 'status', -1)
+
+  const where = {}
+  if (id && id > 0) {
+    where.id = { [Op.eq]: id }
+  }
+  if (name) {
+    where.name = { [Op.substring]: name }
+  }
+  if (phone) {
+    where.phone = { [Op.substring]: phone }
+  }
+  if (email) {
+    where.email = { [Op.substring]: email }
+  }
+  if (status !== -1) {
+    where.status = { [Op.eq]: status }
+  }
+
+  try {
+    const retCount = await UserService.getCount(where)
+    console.log('UserModel pageList count:', retCount)
+    const ret = await UserService.getPageList(where, { exclude: ['password'] }, { currentPage, pageSize })
+    console.log('UserModel pageList:', JSON.stringify(ret, null, 4))
+    Util.success(res, ret)
+  } catch (error) {
+    console.error('UserModel pageList error sqlState:', error)
+    next(error)
+  }
+}
+
+exports.save = async (req, res, next) => {
+  const { body = {} } = req
+  const id = Util.getParam(body, 'id', 0)
+  const name = Util.getParam(body, 'name', '')
+  const password = Util.getParam(body, 'password', '')
+  const phone = Util.getParam(body, 'phone', null)
+  const email = Util.getParam(body, 'email', null)
+  const status = Util.getParam(body, 'status', 1)
+
+  if (!name) {
+    return Util.paramErr(res, '缺少参数：name')
+  }
+  if (!password) {
+    return Util.paramErr(res, '缺少参数：password')
+  }
+
+  if (id && id > 0) {
+    const model = await UserService.getByPk(id)
+    if (model === null) {
+      return Util.paramErr('该记录不存在')
+    }
+  }
+
+  const data = {
+    id,
+    name,
+    password,
+    phone,
+    email,
+    status
+  }
+
+  try {
+    const ret = await UserService.save(data)
+    console.log('UserModel save:', JSON.stringify(ret, null, 4))
+    Util.success(res, ret)
+  } catch (error) {
+    console.error('UserModel save error sqlState:', error)
+    // console.error('UserModel delete error:', JSON.stringify(error))
+    if (error.original && error.original.sqlState === '23000') {
+      return Util.fail(res, '该记录已存在')
+    }
     next(error)
   }
 }
 
 exports.delete = async (req, res, next) => {
+  const { body = {} } = req
+  const id = Util.getParam(body, 'id', 0)
+
+  if (!id || id <= 0) {
+    return Util.paramErr(res, '缺少参数：id')
+  }
+
+  const model = await UserService.getByPk(id)
+  if (!model) {
+    return Util.paramErr(res, '该记录不存在')
+  }
+
+  const data = {
+    id,
+    status: 0
+  }
+
   try {
-    const ret = await UserModel.findOne({
-      where: {
-        id: {
-          [Op.eq]: req.body.id
-        }
-      }
-    })
-
-    if (ret === null) {
-      console.log('UserModel delete Not found:', req.params, req.body, ret)
-      res.status(404).json(ret)
-      return
-    }
-
-    // await ret.destroy() // 物理删除
-    ret.status = 0 // 逻辑软删除
-    await ret.save()
-
-    console.log('UserModel delete:', ret)
-    res.status(204).json(ret)
+    const ret = await UserService.save(data)
+    console.log('UserModel delete:', JSON.stringify(ret, null, 4))
+    Util.success(res)
   } catch (error) {
-    console.log('UserModel delete error:', error)
+    console.error('UserModel delete error:', error)
     next(error)
   }
 }

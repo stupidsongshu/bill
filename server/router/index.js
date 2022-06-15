@@ -15,7 +15,9 @@ const router = express.Router()
 router
   // .post('/user/all', userCtrl.all)
   .post('/user/list', userCtrl.list)
+  .post('/user/pageList', userCtrl.pageList)
   .post('/user/save', userCtrl.save)
+  .post('/user/delete', userCtrl.delete)
   // .post('/user/detail', userCtrl.detail)
   // .post('/user', userCtrl.delete)
 

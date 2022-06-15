@@ -2,21 +2,62 @@ const { Sequelize, DataTypes } = require('sequelize')
 const { dialect, database, username, password, host, port } = require('../config/database')
 
 // sequelize 学习之路(示例代码)：https://www.136.la/tech/show-380302.html
+// https://github.com/sequelize/sequelize/blob/main/src/sequelize.js
 
 // const sequelize = new Sequelize(`${dialect}://${username}:${password}@${host}:${port}/${database}`)
 const sequelize = new Sequelize(database, username, password, {
-  dialect,
-  // dialectOptions: {}, // https://www.npmjs.com/package/mysql#connection-options
-  host,
-  port,
-  storage: `${__dirname}/log/database.${dialect}`,
-  logging: (err) => {
-    console.log(err)
-  },
-  timezone: '+08:00',
+  dialect, // the sql dialect of the database, currently supported: 'mysql', 'sqlite', 'postgres', 'mssql'
+
+  host, // custom host; default: localhost
+
+  port, // custom port; default: dialect default
+
+  logging: (err) => console.log(err), // disable logging or provide a custom logging function; default: console.log
+
+  /**
+   * you can also pass any dialect options to the underlying dialect library
+   * default is empty, currently supported: 'mysql', 'postgres', 'mssql'
+   * 
+   * https://www.npmjs.com/package/mysql#connection-options
+   */
+  // dialectOptions: {
+  //   socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
+  //   supportBigNumbers: true,
+  //   bigNumberStrings: true
+  // },
+
+  // storage: `${__dirname}/log/database.${dialect}`, // the storage engine for sqlite, default ':memory:'
+
+  /**
+   * The timezone used when converting a date from the database into a JavaScript date.
+   * The timezone is also used to SET TIMEZONE when connecting to the server, to ensure that the result of NOW, CURRENT_TIMESTAMP and other time related functions have in the right timezone.
+   * For best cross platform performance use the format +/-HH:MM.
+   * Will also accept string versions of timezones supported by Intl.Locale (e.g. 'America/Los_Angeles');
+   * this is useful to capture daylight savings time changes.
+   */
+  timezone: '+08:00', // default: '+00:00'
+
+  /**
+   * Specify options, which are used when sequelize.define is called.
+   * The following example:
+   *   define: { timestamps: false }
+   * is basically the same as:
+   *   Model.init(attributes, { timestamps: false });
+   *   sequelize.define(name, attributes, { timestamps: false });
+   * so defining the timestamps for each model will be not necessary
+   */
   define: {
+    // dialectOptions: {
+    //   collate: 'utf8_general_ci'
+    // },
+
+    // charset: 'utf8',
+
+    underscored: true, // 字段以下划线（_）来分割（默认是驼峰命名风格）
+
     // 默认情况下,当未提供表名时,Sequelize 会自动将模型名复数并将其用作表名. 
     freezeTableName: true,
+
     /**
      * 时间戳：
      * 默认情况下,Sequelize 使用数据类型 DataTypes.DATE 自动向每个模型添加 createdAt 和 updatedAt 字段.
@@ -31,8 +72,18 @@ const sequelize = new Sequelize(database, username, password, {
     updatedAt: 'update_time',
     deletedAt: false, // 禁用
     // paranoid: true, // 设置 paranoid 为 true 后，destroy() 删除数据时不会进行物理删除(但通过 destroy({ force: true }) 仍然可以物理删除)，而是设置 deletedAt 为当前时间
-    underscored: true, // 字段以下划线（_）来分割（默认是驼峰命名风格）
-  }
+  },
+
+  // pool configuration used to pool database connections
+  pool: {
+    min: 0, // Minimum number of connection in pool
+    max: 5, // Maximum number of connection in pool
+    idle: 30000, // The maximum time, in milliseconds, that a connection can be idle before being released.
+    acquire: 60000, // The maximum time, in milliseconds, that pool will try to get connection before throwing error
+  },
+
+  // isolation level of each transaction, defaults to dialect default
+  // isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ,
 })
 
 // ;(async () => {
