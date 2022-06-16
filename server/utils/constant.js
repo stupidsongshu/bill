@@ -23,7 +23,7 @@ class Constant {
   static MSG_REDIRECT       = '重定向url'
   static MSG_REFRESH_TOKEN  = 'Token过期'
   static MSG_NO_LOGIN       = '请先登录'
-  static NOT_ALLOWED    	  = '无权限'
+  static MSG_NOT_ALLOWED    = '无权限'
   static MSG_NONE     		  = '无数据'
   // static MSG_FOLLOW         = '需要关注'
   // static MSG_PAY     		    = '书币不足'

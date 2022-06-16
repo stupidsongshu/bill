@@ -1,5 +1,5 @@
 const CategoryService = require('../services/category')
-const Uitl = require('../utils')
+const Util = require('../utils')
 
 exports.bulkCreate = async (req, res, next) => {
   const data = [
@@ -46,9 +46,10 @@ exports.bulkCreate = async (req, res, next) => {
 
   try {
     const ret = await CategoryService.bulkCreate(data)
-    return Uitl.success(res, ret)
+    return Util.success(res, ret)
   } catch (error) {
-    console.error('CategoryModel bulkCreate error:', error)
-    next(error)
+    // console.error('CategoryModel bulkCreate error:', error)
+    // next(error)
+    Util.handleApiError(error, res, next)
   }
 }
