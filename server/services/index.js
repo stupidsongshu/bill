@@ -1,4 +1,4 @@
-const { PAGE_SIZE } = require('../utils/constant')
+const Constant = require('../utils/constant')
 
 class Service {
   constructor(model) {
@@ -34,7 +34,7 @@ class Service {
    * @returns 
    */
    async getPageList(where, field = null, pages = {}, order = [], sort = 'asc') {
-    const { currentPage = 1, pageSize = PAGE_SIZE } = pages
+    const { currentPage = 1, pageSize = Constant.PAGE_SIZE } = pages
     const { count, rows } = await this.model.findAndCountAll({
       where,
       attributes: field,

@@ -46,7 +46,7 @@ exports.bulkCreate = async (req, res, next) => {
 
   try {
     const ret = await CategoryService.bulkCreate(data)
-    Uitl.success(res, ret)
+    return Uitl.success(res, ret)
   } catch (error) {
     console.error('CategoryModel bulkCreate error:', error)
     next(error)

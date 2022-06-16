@@ -1,7 +1,7 @@
 const  { Op } = require('sequelize')
 const UserService = require('../services/user')
 const Util = require('../utils')
-const { PAGE_SIZE } = require('../utils/constant')
+const Constant = require('../utils/constant')
 
 // 批量添加 测试数据
 exports.bulkCreate = async (req, res, next) => {
@@ -21,39 +21,47 @@ exports.bulkCreate = async (req, res, next) => {
     console.log('UserModel bulkCreate:',  JSON.stringify(ret, null, 4))
     Util.success(res, ret)
   } catch (error) {
-    console.error('UserModel bulkCreate error:', error)
-    next(error)
+    // console.error('UserModel bulkCreate error:', error)
+    // next(error)
+    Util.handleApiError(error, res, next)
   }
 }
 
-// 查询所有
+// 查询列表
 exports.list = async (req, res, next) => {
-  try {
-    // const ret = await UserModel.findAll({
-    //   where: {
-    //     status: 1
-    //   },
-    //   attributes: {
-    //     exclude: ['password'] // 排除字段
-    //   }
-    // })
+  const { body = {} } = req
+  const phone = Util.getParam(body, 'phone', null)
+  const status = Util.getParam(body, 'status', -1)
 
+  const order = Util.getParam(body, 'order', null)
+  const sort = Util.getParam(body, 'sort', 'asc')
+
+  const where = {}
+  if (phone) {
+    where.phone = { [Op.eq]: phone }
+  }
+  if (status !== -1) {
+    where.status = { [Op.eq]: status }
+  }
+
+  const orderBy = []
+  if (order) {
+    orderBy.push([order, sort])
+  }
+
+  try {
     const ret = await UserService.getList(
-      {
-        status: 1
-      },
+      where,
       {
         exclude: ['password'] // 排除字段
       },
-      [
-        ['id', 'desc']
-      ]
+      orderBy, // [ ['id', 'desc'] ]
     )
 
     // console.log('UserModel list:', ret)
-    // console.log('UserModel list:', ret.toJSON)
-    // console.log(ret.get({ plain: true })) // 获取干净的 JSON 对象
-    console.log('UserModel list:',  JSON.stringify(ret, null, 4))
+    // console.log('UserModel list:', ret.toJSON) // ❌
+    // console.log(ret.get({ plain: true })) // ❌ 获取干净的 JSON 对象
+    // console.log('UserModel list:',  JSON.stringify(ret, null, 4)) // ✅
 
     // 手机号脱敏
     ret.forEach(item => {
@@ -67,8 +75,10 @@ exports.list = async (req, res, next) => {
     }
     return Util.none(res)
   } catch (error) {
-    console.error('UserModel list error:', error)
-    next(error)
+    // console.error('UserModel list error:', error, JSON.stringify(error))
+    // next(error)
+    // return Util.fail(res, error.message)
+    Util.handleApiError(error, res, next)
   }
 }
 
@@ -76,7 +86,7 @@ exports.list = async (req, res, next) => {
 exports.pageList = async (req, res, next) => {
   const { body = {} } = req
   const currentPage = Util.getParam(body, 'currentPage', 1)
-  const pageSize = Util.getParam(body, 'pageSize', PAGE_SIZE)
+  const pageSize = Util.getParam(body, 'pageSize', Constant.PAGE_SIZE)
   const id = Util.getParam(body, 'id', 0)
   const name = Util.getParam(body, 'name', '')
   // const password = Util.getParam(body, 'password', '')
@@ -106,10 +116,11 @@ exports.pageList = async (req, res, next) => {
     // console.log('UserModel pageList count:', retCount)
     const ret = await UserService.getPageList(where, { exclude: ['password'] }, { currentPage, pageSize })
     console.log('UserModel pageList:', JSON.stringify(ret, null, 4))
-    Util.success(res, ret)
+    return Util.success(res, ret)
   } catch (error) {
-    console.error('UserModel pageList error sqlState:', error)
-    next(error)
+    // console.error('UserModel pageList error:', error)
+    // next(error)
+    Util.handleApiError(error, res, next)
   }
 }
 
@@ -151,12 +162,12 @@ exports.save = async (req, res, next) => {
     console.log('UserModel save:', JSON.stringify(ret, null, 4))
     Util.success(res, ret)
   } catch (error) {
-    console.error('UserModel save error sqlState:', error)
-    // console.error('UserModel delete error:', JSON.stringify(error))
-    if (error.original && error.original.sqlState === '23000') {
-      return Util.fail(res, '该记录已存在')
-    }
-    next(error)
+    // console.error('UserModel save error sqlState:', error)
+    // if (error.original && error.original.sqlState === '23000') {
+    //   return Util.fail(res, '该记录已存在')
+    // }
+    // next(error)
+    Util.handleApiError(error, res, next)
   }
 }
 
@@ -184,7 +195,8 @@ exports.delete = async (req, res, next) => {
     console.log('UserModel delete:', JSON.stringify(ret, null, 4))
     Util.success(res)
   } catch (error) {
-    console.error('UserModel delete error:', error)
-    next(error)
+    // console.error('UserModel delete error:', error)
+    // next(error)
+    Util.handleApiError(error, res, next)
   }
 }
