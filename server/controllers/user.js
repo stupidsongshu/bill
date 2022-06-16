@@ -63,14 +63,13 @@ exports.list = async (req, res, next) => {
     // console.log(ret.get({ plain: true })) // ❌ 获取干净的 JSON 对象
     // console.log('UserModel list:',  JSON.stringify(ret, null, 4)) // ✅
 
-    // 手机号脱敏
-    ret.forEach(item => {
-      if (item.phone) {
-        item.phone = item.phone.substr(0, 3) + '****' + item.phone.substr(7)
-      }
-    })
-
     if (ret.length > 0) {
+      // 手机号脱敏
+      ret.forEach(item => {
+        if (item.phone) {
+          item.phone = item.phone.substr(0, 3) + '****' + item.phone.substr(7)
+        }
+      })
       return Util.success(res, ret)
     }
     return Util.none(res)
@@ -116,7 +115,17 @@ exports.pageList = async (req, res, next) => {
     // console.log('UserModel pageList count:', retCount)
     const ret = await UserService.getPageList(where, { exclude: ['password'] }, { currentPage, pageSize })
     console.log('UserModel pageList:', JSON.stringify(ret, null, 4))
-    return Util.success(res, ret)
+
+    if (ret.list.length > 0) {
+      // 手机号脱敏
+      ret.list.forEach(item => {
+        if (item.phone) {
+          item.phone = item.phone.substr(0, 3) + '****' + item.phone.substr(7)
+        }
+      })
+      return Util.success(res, ret)
+    }
+    return Util.none(res)
   } catch (error) {
     // console.error('UserModel pageList error:', error)
     // next(error)

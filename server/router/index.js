@@ -1,4 +1,5 @@
 const express = require('express')
+const accountCtrl = require('../controllers/account')
 const userCtrl = require('../controllers/user')
 const categoryCtrl = require('../controllers/category')
 
@@ -14,6 +15,9 @@ const router = express.Router()
 //   .delete('/user/:id', userCtrl.delete)
 
 router
+  .post('/login/account', accountCtrl.login)
+  .get('/currentUser', accountCtrl.currentUser)
+
   // .post('/user/all', userCtrl.all)
   .post('/user/bulkCreate', userCtrl.bulkCreate)
   .post('/user/list', userCtrl.list)

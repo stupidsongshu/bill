@@ -75,12 +75,12 @@ const sequelize = new Sequelize(database, username, password, {
   },
 
   // pool configuration used to pool database connections
-  pool: {
-    min: 0, // Minimum number of connection in pool
-    max: 5, // Maximum number of connection in pool
-    idle: 30000, // The maximum time, in milliseconds, that a connection can be idle before being released.
-    acquire: 60000, // The maximum time, in milliseconds, that pool will try to get connection before throwing error
-  },
+  // pool: {
+  //   min: 0, // Minimum number of connection in pool
+  //   max: 5, // Maximum number of connection in pool
+  //   idle: 30000, // The maximum time, in milliseconds, that a connection can be idle before being released.
+  //   acquire: 60000, // The maximum time, in milliseconds, that pool will try to get connection before throwing error
+  // },
 
   // isolation level of each transaction, defaults to dialect default
   // isolationLevel: Transaction.ISOLATION_LEVELS.REPEATABLE_READ,
