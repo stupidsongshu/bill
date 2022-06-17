@@ -43,11 +43,18 @@ class Service {
       order
     })
     return {
-      currentPage,
+      // currentPage,
+      // totalPage: Math.ceil(count / pageSize),
       pageSize,
-      totalCount: count,
-      totalPage: Math.ceil(count / pageSize),
-      list: rows
+      total: count,
+      data: rows,
+      /**
+       * ant-design-pro ProTable request
+       * https://procomponents.ant.design/components/table#request
+       * 
+       * success 请返回 true，不然 table 会停止解析数据，即使有数据
+       */
+      status: true,
     }
   }
 

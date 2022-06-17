@@ -17,6 +17,7 @@ const router = express.Router()
 router
   .post('/login/account', accountCtrl.login)
   .get('/currentUser', accountCtrl.currentUser)
+  .get('/notices', accountCtrl.getNotices)
 
   // .post('/user/all', userCtrl.all)
   .post('/user/bulkCreate', userCtrl.bulkCreate)

@@ -84,7 +84,13 @@ exports.list = async (req, res, next) => {
 // 分页查询
 exports.pageList = async (req, res, next) => {
   const { body = {} } = req
-  const currentPage = Util.getParam(body, 'currentPage', 1)
+  /**
+   * ant-design-pro ProTable request
+   * https://procomponents.ant.design/components/table#request
+   * 
+   * 第一个参数中一定会有 pageSize 和 current ，这两个参数是 antd 的规范
+   */
+  const currentPage = Util.getParam(body, 'current', 1)
   const pageSize = Util.getParam(body, 'pageSize', Constant.PAGE_SIZE)
   const id = Util.getParam(body, 'id', 0)
   const name = Util.getParam(body, 'name', '')
@@ -114,18 +120,19 @@ exports.pageList = async (req, res, next) => {
     // const retCount = await UserService.getCount(where)
     // console.log('UserModel pageList count:', retCount)
     const ret = await UserService.getPageList(where, { exclude: ['password'] }, { currentPage, pageSize })
-    console.log('UserModel pageList:', JSON.stringify(ret, null, 4))
+    // console.log('UserModel pageList:', JSON.stringify(ret, null, 4))
 
-    if (ret.list.length > 0) {
+    if (ret.data.length > 0) {
       // 手机号脱敏
-      ret.list.forEach(item => {
+      ret.data.forEach(item => {
         if (item.phone) {
           item.phone = item.phone.substr(0, 3) + '****' + item.phone.substr(7)
         }
       })
-      return Util.success(res, ret)
+      // return Util.success(res, ret)
     }
-    return Util.none(res)
+    // return Util.none(res)
+    return res.status(200).json(ret)
   } catch (error) {
     // console.error('UserModel pageList error:', error)
     // next(error)
@@ -196,7 +203,7 @@ exports.delete = async (req, res, next) => {
 
   const data = {
     id,
-    status: 0
+    status: 0 // 软删除
   }
 
   try {
