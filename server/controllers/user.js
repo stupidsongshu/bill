@@ -157,20 +157,21 @@ exports.save = async (req, res, next) => {
     return Util.paramErr(res, '缺少参数：password')
   }
 
-  if (id && id > 0) {
-    const model = await UserService.getByPk(id)
-    if (model === null) {
-      return Util.paramErr('该记录不存在')
-    }
-  }
-
-  const data = {
+  let data = {
     id,
     name,
     password,
     phone,
     email,
     status
+  }
+
+  if (id && id > 0) {
+    const model = await UserService.getByPk(id)
+    if (model === null) {
+      return Util.paramErr('该记录不存在')
+    }
+    data = Util.deepMerge({}, model.dataValues, data)
   }
 
   try {
@@ -187,7 +188,7 @@ exports.save = async (req, res, next) => {
   }
 }
 
-// 删除
+// 删除/禁用
 exports.delete = async (req, res, next) => {
   const { body = {} } = req
   const id = Util.getParam(body, 'id', 0)

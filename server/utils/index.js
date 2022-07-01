@@ -89,5 +89,16 @@ module.exports = {
     }
 
     this.fail(res, error.message)
-  }
+  },
+  deepMerge(target, ...args) {
+    args.forEach(source => {
+      for (let key in source) {
+        // 值为 null 的不合并
+        if (source[key] !== null) {
+          target[key] = target[key] && source[key] && target[key].toString() === '[object Object]' && source[key].toString() === '[object Object]' ? deepMerge(target[key], source[key]) : target[key] = source[key]    
+        }
+      }
+    })
+    return target
+  },
 }
