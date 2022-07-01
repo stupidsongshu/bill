@@ -88,6 +88,9 @@ const UserList: FC = () => {
       rowKey='id'
       rowSelection={{}}
       columns={columns}
+      editable={{
+        type: 'single'
+      }}
       request={getUserPageList}
       ></ProTable>
   </PageContainer>
