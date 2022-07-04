@@ -30,7 +30,7 @@ exports.bulkCreate = async (req, res, next) => {
 
 // 查询列表
 exports.list = async (req, res, next) => {
-  const { body = {} } = req
+  const { query: body = {} } = req
   const phone = Util.getParam(body, 'phone', null)
   const status = Util.getParam(body, 'status', -1)
 

@@ -1,5 +1,5 @@
 const express = require('express')
-const accountCtrl = require('../controllers/account')
+const adminCtrl = require('../controllers/admin')
 const userCtrl = require('../controllers/user')
 const categoryCtrl = require('../controllers/category')
 
@@ -15,9 +15,9 @@ const router = express.Router()
 //   .delete('/user/:id', userCtrl.delete)
 
 router
-  .post('/login/account', accountCtrl.login)
-  .get('/currentUser', accountCtrl.currentUser)
-  .get('/notices', accountCtrl.getNotices)
+  .post('/login/account', adminCtrl.login)
+  .get('/currentUser', adminCtrl.currentUser)
+  .get('/notices', adminCtrl.getNotices)
 
   // .post('/user/all', userCtrl.all)
   .post('/user/bulkCreate', userCtrl.bulkCreate) // 批量添加 测试数据

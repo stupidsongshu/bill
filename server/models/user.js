@@ -99,16 +99,19 @@ module.exports = (sequelize) => {
     password: {
       type: DataTypes.STRING(45),
       allowNull: false, // default: true. If false, the column will have a NOT NULL constraint, and a not null validation will be run before an instance is saved.
+      defaultValue: '',
       comment: '密码'
     },
     login_type: {
-      type: DataTypes.TINYINT(1),
+      type: DataTypes.TINYINT(1).UNSIGNED,
       allowNull: false,
+      defaultValue: 0,
       comment: '登录方式，0-未知，1-手机号+验证码，2-手机号+密码，3-邮箱+验证码，4-邮箱+密码'
     },
     nickname: {
       type: DataTypes.STRING(20),
       allowNull: false,
+      defaultValue: '',
       comment: '昵称'
     },
     // create_time: {
@@ -127,8 +130,8 @@ module.exports = (sequelize) => {
       // type: DataTypes.BOOLEAN, // TINYINT(1)
       // defaultValue: true,
       type: DataTypes.TINYINT(1).UNSIGNED,
-      defaultValue: 1,
       allowNull: false,
+      defaultValue: 1,
       comment: '状态，0-无效，1-正常'
     }
   }, {

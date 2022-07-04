@@ -47,17 +47,19 @@ module.exports = (sequelize) => {
     title: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: '',
       comment: '标题'
     },
     remark: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: '',
       comment: '备注'
     },
     status: {
       type: DataTypes.TINYINT(1).UNSIGNED,
-      defaultValue: 1,
       allowNull: false,
+      defaultValue: 1,
       comment: '状态，0-无效，1-交易成功，2-交易失败'
     }
   }, {

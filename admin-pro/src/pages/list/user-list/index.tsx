@@ -8,6 +8,9 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table'
 import { ModalForm, ProFormSelect, ProFormText } from '@ant-design/pro-form'
 import type { TableListItem, TableListParams } from './data'
 import { getUserPageList, addUser, updateUser } from './service'
+import { statusEnum, getSelectValueEnum } from '../../../utils/enum'
+
+const statusSelectValueEnum = getSelectValueEnum(statusEnum)
 
 async function handleSave(fields: TableListItem, currentRow?: TableListItem): Promise<boolean> {
   const data = { ...currentRow, ...fields }
@@ -83,17 +86,7 @@ const UserList: FC = () => {
       dataIndex: 'status',
       title: '状态',
       valueType: 'select',
-      valueEnum: {
-        // 状态，0-无效，1-正常
-        0: {
-          text: '无效',
-          status: 'Error'
-        },
-        1: {
-          text: '正常',
-          status: 'Success'
-        }
-      }
+      valueEnum: statusEnum,
     },
     {
       dataIndex: 'option',
@@ -197,10 +190,12 @@ const UserList: FC = () => {
         label="状态"
         name="status"
         width='md'
-        valueEnum={{
-          0: '无效',
-          1: '正常'
+        convertValue={(val, field) => {
+          // [convertValue 前置转化](https://procomponents.ant.design/components/form#convertvalue-%E5%89%8D%E7%BD%AE%E8%BD%AC%E5%8C%96)
+          // convertValue 发生在组件获得数据之前，一般是后端直接给前端的数据，有时需要精加工一下。
+          return val.toString()
         }}
+        valueEnum={statusSelectValueEnum}
         placeholder="请选择用户状态"
       ></ProFormSelect>
     </ModalForm>}
