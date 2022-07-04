@@ -3,12 +3,12 @@ class Constant {
 
   //返回结果状态
   static CODE_SUCC			    = 200
-  static CODE_PARAMS_ERR    = 255
   static CODE_REDIRECT      = 302
   static CODE_REFRESH_TOKEN = 400
   static CODE_NO_LOGIN      = 401
   static CODE_NOT_ALLOWED   = 403
   static CODE_NONE			    = 404
+  static CODE_PARAMS_ERR    = 428
   // static CODE_FOLLOW		    = 405
   // static CODE_PAY			      = 406
   // static CODE_CAPTCHA	      = 407
@@ -19,12 +19,12 @@ class Constant {
 
   //返回结果消息
   static MSG_SUCC     		  = 'success' 
-  static MSG_PARAMS_ERR     = '参数异常'
   static MSG_REDIRECT       = '重定向url'
   static MSG_REFRESH_TOKEN  = 'Token过期'
   static MSG_NO_LOGIN       = '请先登录'
   static MSG_NOT_ALLOWED    = '无权限'
   static MSG_NONE     		  = '无数据'
+  static MSG_PARAMS_ERR     = '参数异常'
   // static MSG_FOLLOW         = '需要关注'
   // static MSG_PAY     		    = '书币不足'
   // static MSG_UNLOCK         = '需要解锁'

@@ -86,25 +86,30 @@ module.exports = (sequelize) => {
       autoIncrement: true,
       primaryKey: true
     },
-    name: {
-      type: DataTypes.STRING(255),
-      allowNull: false, // default: true. If false, the column will have a NOT NULL constraint, and a not null validation will be run before an instance is saved.
-      comment: '用户名' // Comment for this column
-    },
-    password: {
-      type: DataTypes.STRING(45),
-      allowNull: false,
-      comment: '密码'
-    },
     phone: {
       type: DataTypes.STRING(20),
       // unique: true, // default: false. If true, the column will get a unique constraint. If a string is provided, the column will be part of a composite unique index. If multiple columns have the same string, they will be part of the same unique index
-      comment: '手机号'
+      comment: '手机号' // Comment for this column
     },
     email: {
       type: DataTypes.STRING(255),
       // unique: true,
       comment: '邮箱'
+    },
+    password: {
+      type: DataTypes.STRING(45),
+      allowNull: false, // default: true. If false, the column will have a NOT NULL constraint, and a not null validation will be run before an instance is saved.
+      comment: '密码'
+    },
+    login_type: {
+      type: DataTypes.TINYINT(1),
+      allowNull: false,
+      comment: '登录方式，0-未知，1-手机号+验证码，2-手机号+密码，3-邮箱+验证码，4-邮箱+密码'
+    },
+    nickname: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      comment: '昵称'
     },
     // create_time: {
     //   type: DataTypes.DATE,

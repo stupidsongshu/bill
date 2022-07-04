@@ -20,13 +20,13 @@ router
   .get('/notices', accountCtrl.getNotices)
 
   // .post('/user/all', userCtrl.all)
-  .post('/user/bulkCreate', userCtrl.bulkCreate)
-  .post('/user/list', userCtrl.list)
-  .post('/user/pageList', userCtrl.pageList)
-  .post('/user/save', userCtrl.save)
-  .post('/user/delete', userCtrl.delete)
-  // .post('/user/detail', userCtrl.detail)
-  // .post('/user', userCtrl.delete)
+  .post('/user/bulkCreate', userCtrl.bulkCreate) // 批量添加 测试数据
+  .get('/user/list', userCtrl.list) // 查询
+  .get('/user/pageList', userCtrl.pageList) // 分页查询
+  // .get('/user/detail', userCtrl.detail) // 查询
+  .post('/user/save', userCtrl.save) // 新增
+  .put('/user/save', userCtrl.save) // 更新
+  .delete('/user/delete', userCtrl.delete) // 删除
 
   .post('/category/bulkCreate', categoryCtrl.bulkCreate)
 

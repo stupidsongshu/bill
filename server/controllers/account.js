@@ -1,4 +1,4 @@
-const AccountService = require('../services/account')
+const AdminService = require('../services/admin')
 const Util = require('../utils')
 
 /**

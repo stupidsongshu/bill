@@ -120,9 +120,9 @@ const sequelize = new Sequelize(database, username, password, {
 
 module.exports = {
   // TestModel: require('./test')(sequelize, DataTypes),
+  AdminModel: require('./admin')(sequelize, DataTypes),
   BillModel: require('./bill')(sequelize, DataTypes),
   UserModel: require('./user')(sequelize, DataTypes),
-  AccountModel: require('./account')(sequelize, DataTypes),
   DealModel: require('./deal')(sequelize, DataTypes),
   CategoryModel: require('./category')(sequelize, DataTypes),
 }

@@ -1,46 +1,61 @@
 const Constant = require('./constant')
 
 module.exports = {
+  deepMerge(target, ...args) {
+    args.forEach(source => {
+      for (let key in source) {
+        // 值为 null 的不合并
+        if (source[key] !== null) {
+          target[key] = target[key] && source[key] && target[key].toString() === '[object Object]' && source[key].toString() === '[object Object]' ? deepMerge(target[key], source[key]) : target[key] = source[key]    
+        }
+      }
+    })
+    return target
+  },
   getParam(data, key, def = null) {
     if (data.hasOwnProperty(key)) {
       let val = data[key]
-      if (typeof val === 'string') {
-        val = val.trim()
+      if (val !== undefined) {
+        if (typeof def === 'string') {
+          val = val.trim()
+        } else if (typeof def === 'number') {
+          val = +val
+        }
       }
       return val
     }
     return def
   },
   paramErr(response, message = Constant.MSG_PARAMS_ERR) {
-    response.status(200).json({
-      code: Constant.CODE_PARAMS_ERR,
-      message
+    response.status(Constant.CODE_PARAMS_ERR).json({
+      errorCode: Constant.CODE_PARAMS_ERR,
+      errorMessage: message
     })
   },
   success(response, data, message = Constant.MSG_SUCC) {
-    response.status(200).json({
-      code: Constant.CODE_SUCC,
-      message,
+    response.status(Constant.CODE_SUCC).json({
+      errorCode: Constant.CODE_SUCC,
+      errorMessage: message,
       data
     })
   },
   fail(response, message = Constant.MSG_FAIL) {
-    response.status(200).json({
-      code: Constant.CODE_FAIL,
-      message
+    response.status(Constant.CODE_FAIL).json({
+      errorCode: Constant.CODE_FAIL,
+      errorMessage: message
     })
   },
   none(response, message = Constant.MSG_NONE) {
-    response.status(200).json({
-      code: Constant.CODE_NONE,
-      message
+    response.status(Constant.CODE_NONE).json({
+      errorCode: Constant.CODE_NONE,
+      errorMessage: message
     })
   },
-  handleApiError(error, res, next) {
+  handleApiError(error, response, next) {
     next(error)
     console.log(error.constructor)
     if (error.original && error.original.sqlState === '23000') {
-      this.fail(res, '该记录已存在')
+      this.fail(response, '该记录已存在')
       return
     }
     // console.error(`handleApiError:`, error)
@@ -88,17 +103,6 @@ module.exports = {
       console.error(`handleApiError:`, error)
     }
 
-    this.fail(res, error.message)
-  },
-  deepMerge(target, ...args) {
-    args.forEach(source => {
-      for (let key in source) {
-        // 值为 null 的不合并
-        if (source[key] !== null) {
-          target[key] = target[key] && source[key] && target[key].toString() === '[object Object]' && source[key].toString() === '[object Object]' ? deepMerge(target[key], source[key]) : target[key] = source[key]    
-        }
-      }
-    })
-    return target
+    this.fail(response, error.message)
   },
 }

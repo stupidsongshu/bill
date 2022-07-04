@@ -9,10 +9,11 @@ exports.bulkCreate = async (req, res, next) => {
   let startNo = 100
   for (let i = 0; i < 100; i++) {
     data.push({
-      name: `user_${i}`,
-      password: `pwd_${i}`,
       phone: `13012345${startNo++}`,
-      email: `google_${i}@gmail.com`
+      email: `google_${i}@gmail.com`,
+      password: `pwd_${i}`,
+      login_type: (i % 4) + 1,
+      nickname: `user_${i}`,
     })
   }
 
@@ -83,40 +84,39 @@ exports.list = async (req, res, next) => {
 
 // 分页查询
 exports.pageList = async (req, res, next) => {
-  const { body = {} } = req
-  /**
-   * ant-design-pro ProTable request
-   * https://procomponents.ant.design/components/table#request
-   * 
-   * 第一个参数中一定会有 pageSize 和 current ，这两个参数是 antd 的规范
-   */
-  const currentPage = Util.getParam(body, 'current', 1)
-  const pageSize = Util.getParam(body, 'pageSize', Constant.PAGE_SIZE)
-  const id = Util.getParam(body, 'id', 0)
-  const name = Util.getParam(body, 'name', '')
-  // const password = Util.getParam(body, 'password', '')
-  const phone = Util.getParam(body, 'phone', null)
-  const email = Util.getParam(body, 'email', null)
-  const status = Util.getParam(body, 'status', -1)
-
-  const where = {}
-  if (id && id > 0) {
-    where.id = { [Op.eq]: id }
-  }
-  if (name) {
-    where.name = { [Op.substring]: name }
-  }
-  if (phone) {
-    where.phone = { [Op.substring]: phone }
-  }
-  if (email) {
-    where.email = { [Op.substring]: email }
-  }
-  if (status !== -1) {
-    where.status = { [Op.eq]: status }
-  }
-
   try {
+    const { query: body = {} } = req
+    /**
+     * ant-design-pro ProTable request
+     * https://procomponents.ant.design/components/table#request
+     * 
+     * 第一个参数中一定会有 pageSize 和 current ，这两个参数是 antd 的规范
+     */
+    const currentPage = Util.getParam(body, 'current', 1)
+    const pageSize = Util.getParam(body, 'pageSize', Constant.PAGE_SIZE)
+    const id = Util.getParam(body, 'id', 0)
+    const nickname = Util.getParam(body, 'nickname', '')
+    // const password = Util.getParam(body, 'password', '')
+    const phone = Util.getParam(body, 'phone', null)
+    const email = Util.getParam(body, 'email', null)
+    const status = Util.getParam(body, 'status', -1)
+  
+    const where = {}
+    if (id && id > 0) {
+      where.id = { [Op.eq]: id }
+    }
+    if (nickname) {
+      where.nickname = { [Op.substring]: nickname }
+    }
+    if (phone) {
+      where.phone = { [Op.substring]: phone }
+    }
+    if (email) {
+      where.email = { [Op.substring]: email }
+    }
+    if (status !== -1) {
+      where.status = { [Op.eq]: status }
+    }
     // const retCount = await UserService.getCount(where)
     // console.log('UserModel pageList count:', retCount)
     const ret = await UserService.getPageList(where, { exclude: ['password'] }, { currentPage, pageSize })
@@ -144,24 +144,24 @@ exports.pageList = async (req, res, next) => {
 exports.save = async (req, res, next) => {
   const { body = {} } = req
   const id = Util.getParam(body, 'id', 0)
-  const name = Util.getParam(body, 'name', '')
-  const password = Util.getParam(body, 'password', '')
-  const phone = Util.getParam(body, 'phone', null)
+  const nickname = Util.getParam(body, 'nickname', '')
+  // const password = Util.getParam(body, 'password', '')
+  // const phone = Util.getParam(body, 'phone', null)
   const email = Util.getParam(body, 'email', null)
   const status = Util.getParam(body, 'status', 1)
 
-  if (!name) {
-    return Util.paramErr(res, '缺少参数：name')
+  if (!nickname) {
+    return Util.paramErr(res, '缺少参数：nickname')
   }
-  if (!password) {
-    return Util.paramErr(res, '缺少参数：password')
-  }
+  // if (!password) {
+  //   return Util.paramErr(res, '缺少参数：password')
+  // }
 
   let data = {
     id,
-    name,
-    password,
-    phone,
+    nickname,
+    // password,
+    // phone,
     email,
     status
   }
@@ -184,6 +184,74 @@ exports.save = async (req, res, next) => {
     //   return Util.fail(res, '该记录已存在')
     // }
     // next(error)
+    Util.handleApiError(error, res, next)
+  }
+}
+
+// 修改密码
+exports.updatePassword = async (req, res, next) => {
+  const { body = {} } = req
+  const id = Util.getParam(body, 'id', 0)
+  const password = Util.getParam(body, 'password', null)
+
+  if (!id) {
+    return Util.paramErr(res, '缺少参数：id')
+  }
+  if (!password) {
+    return Util.paramErr(res, '缺少参数：password')
+  }
+
+  let data = {
+    id,
+    password,
+  }
+
+  if (id && id > 0) {
+    const model = await UserService.getByPk(id)
+    if (model === null) {
+      return Util.paramErr('该记录不存在')
+    }
+    data = Util.deepMerge({}, model.dataValues, data)
+  }
+
+  try {
+    const ret = await UserService.save(data)
+    Util.success(res, ret)
+  } catch (error) {
+    Util.handleApiError(error, res, next)
+  }
+}
+
+// 修改手机号
+exports.updatePhone = async (req, res, next) => {
+  const { body = {} } = req
+  const id = Util.getParam(body, 'id', 0)
+  const phone = Util.getParam(body, 'phone', null)
+
+  if (!id) {
+    return Util.paramErr(res, '缺少参数：id')
+  }
+  if (!phone) {
+    return Util.paramErr(res, '缺少参数：phone')
+  }
+
+  let data = {
+    id,
+    phone,
+  }
+
+  if (id && id > 0) {
+    const model = await UserService.getByPk(id)
+    if (model === null) {
+      return Util.paramErr('该记录不存在')
+    }
+    data = Util.deepMerge({}, model.dataValues, data)
+  }
+
+  try {
+    const ret = await UserService.save(data)
+    Util.success(res, ret)
+  } catch (error) {
     Util.handleApiError(error, res, next)
   }
 }

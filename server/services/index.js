@@ -95,7 +95,7 @@ class Service {
     return this.update(data, { id })
   }
 
-  // 修改数据
+  // 添加/修改数据
   save(data) {
     if (data.id) {
       return this.saveIdData(data)

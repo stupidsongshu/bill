@@ -1,6 +1,8 @@
+import React from 'react'
+
 export type TableListItem = {
-  id: number;
-  name: string;
+  id: React.Key;
+  nickname: string;
   password: string;
   phone: string;
   email: string;
@@ -43,8 +45,8 @@ export type TableListData = {
 }
 
 export type TableListParams = {
-  id?: number;
-  name?: string;
+  id?: React.Key;
+  nickname?: string;
   phone?: string;
   email?: string;
   status?: number;

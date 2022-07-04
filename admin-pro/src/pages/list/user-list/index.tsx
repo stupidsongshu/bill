@@ -7,97 +7,118 @@ import ProTable from '@ant-design/pro-table'
 import type { ProColumns, ActionType } from '@ant-design/pro-table'
 import { ModalForm, ProFormSelect, ProFormText } from '@ant-design/pro-form'
 import type { TableListItem, TableListParams } from './data'
-import { getUserPageList, userSave } from './service'
+import { getUserPageList, addUser, updateUser } from './service'
 
-const columns: ProColumns<TableListItem>[] = [
-  {
-    dataIndex: 'id',
-    title: '编号',
-    valueType: 'checkbox',
-    hideInSearch: true,
-    width: 80,
-  },
-  {
-    dataIndex: 'name',
-    title: '用户名',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项'
-        }
-      ]
+async function handleSave(fields: TableListItem, currentRow?: TableListItem): Promise<boolean> {
+  const data = { ...currentRow, ...fields }
+  console.log('handleSave currentRow:', currentRow)
+  console.log('handleSave fields:', fields)
+  console.log('handleSave data:', data)
+  const action = data.id ? '更新' : '添加'
+  const hide = message.loading('正在' + action)
+  try {
+    if (data.id) {
+      await updateUser(data)
+    } else {
+      await addUser(data)
     }
-  },
-  {
-    dataIndex: 'password',
-    title: '用户密码',
-    hideInTable: true,
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项'
-        }
-      ]
-    }
-  },
-  {
-    dataIndex: 'phone',
-    title: '手机号',
-  },
-  {
-    dataIndex: 'email',
-    title: '邮箱',
-  },
-  {
-    dataIndex: 'status',
-    title: '状态',
-    valueType: 'select',
-    valueEnum: {
-      // 状态，0-无效，1-正常
-      0: {
-        text: '无效',
-        status: 'Error'
-      },
-      1: {
-        text: '正常',
-        status: 'Success'
-      }
-    }
-  },
-  {
-    dataIndex: 'option',
-    title: '操作',
-    valueType: 'option',
-    render: (text, record, index, action) => [
-      <a
-        key='editable'
-        onClick={() => {
-          action?.startEditable?.(record.id)
-        }}
-      >
-        编辑
-      </a>
-    ]
+    hide()
+    message.success(action + '成功')
+    return true
+  } catch (error) {
+    hide()
+    message.error(action + '失败请重试！')
+    return false
   }
-]
+}
 
 const UserList: FC = () => {
   const actionRef= useRef<ActionType>()
+  const [currentRow, setCurrentRow] = useState<TableListItem>()
   const [createModalVisible, handleModalVisible] = useState<boolean>(false)
 
-  async function handleAdd(fields: TableListItem): Promise<boolean> {
-    const hide = message.loading('正在添加')
-    try {
-      await userSave(fields)
-      hide()
-      message.success('添加成功')
-      return true
-    } catch (error) {
-      hide()
-      message.error('添加失败请重试！')
-      return false
+  const columns: ProColumns<TableListItem>[] = [
+    {
+      dataIndex: 'id',
+      title: '编号',
+      valueType: 'checkbox',
+      hideInSearch: true,
+      width: 80,
+    },
+    {
+      dataIndex: 'nickname',
+      title: '昵称',
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: '此项为必填项'
+          }
+        ]
+      }
+    },
+    {
+      dataIndex: 'password',
+      title: '用户密码',
+      hideInTable: true,
+      hideInSearch: true,
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: '此项为必填项'
+          }
+        ]
+      }
+    },
+    {
+      dataIndex: 'phone',
+      title: '手机号',
+    },
+    {
+      dataIndex: 'email',
+      title: '邮箱',
+    },
+    {
+      dataIndex: 'status',
+      title: '状态',
+      valueType: 'select',
+      valueEnum: {
+        // 状态，0-无效，1-正常
+        0: {
+          text: '无效',
+          status: 'Error'
+        },
+        1: {
+          text: '正常',
+          status: 'Success'
+        }
+      }
+    },
+    {
+      dataIndex: 'option',
+      title: '操作',
+      valueType: 'option',
+      render: (text, record, index, action) => [
+        <a
+          key='editable'
+          onClick={() => {
+            // action?.startEditable?.(record.id)
+            setCurrentRow(record)
+            handleModalVisible(true)
+          }}
+        >
+          编辑
+        </a>
+      ]
+    }
+  ]
+
+  function onVisibleChange(visible: boolean) {
+    console.log('onVisibleChange:', visible)
+    handleModalVisible(visible)
+    if (!visible) {
+      setCurrentRow(undefined)
     }
   }
 
@@ -109,13 +130,14 @@ const UserList: FC = () => {
       rowKey='id'
       rowSelection={{}}
       columns={columns}
-      editable={{
-        type: 'single'
-      }}
+      // editable={{
+      //   type: 'single'
+      // }}
       toolBarRender={() => [
         <Button
           type="primary"
           onClick={() => {
+            setCurrentRow(undefined)
             handleModalVisible(true)
           }}
         >
@@ -125,42 +147,51 @@ const UserList: FC = () => {
       request={getUserPageList}>
     </ProTable>
 
-    <ModalForm
-      title="新建"
+    {!createModalVisible ? null : <ModalForm
+      title={currentRow && currentRow.id ? '编辑' : '新建'}
       width={500}
       layout="horizontal"
       labelCol={{span: 4}}
       wrapperCol={{span: 20}}
       visible={createModalVisible}
-      onVisibleChange={handleModalVisible}
+      onVisibleChange={onVisibleChange}
       onFinish={async (values) => {
-        const success = await handleAdd(values as TableListItem)
+        const success = await handleSave(values as TableListItem, currentRow)
         if (success) {
           handleModalVisible(false)
+          // setCurrentRow(undefined)
           if (actionRef.current) {
             actionRef.current.reload()
           }
         }
       }}
+      initialValues={{
+        status: '1',
+        ...currentRow
+      }}
       >
       <ProFormText
-        label="用户名"
-        name="name"
+        label="昵称"
+        name="nickname"
         width="md"
         rules={[
-          { required: true, message: '请输入用户名' }
+          { required: true, message: '请输入昵称' }
         ]}
       >
       </ProFormText>
-      <ProFormText.Password
-        label="密码"
-        name="password"
-        width='md'
-        rules={[
-          { required: true, message: '请输入密码' }
-        ]}>
-      </ProFormText.Password>
-      <ProFormText label="手机号" name="phone" width="md"></ProFormText>
+      { currentRow && currentRow.id ? null :
+        <>
+          <ProFormText.Password
+            label="密码"
+            name="password"
+            width='md'
+            rules={[
+              { required: true, message: '请输入密码' }
+            ]}>
+          </ProFormText.Password>
+          <ProFormText label="手机号" name="phone" width="md"></ProFormText>
+        </>
+      }
       <ProFormText label="邮箱" name="email" width="md"></ProFormText>
       <ProFormSelect
         label="状态"
@@ -170,10 +201,9 @@ const UserList: FC = () => {
           0: '无效',
           1: '正常'
         }}
-        initialValue="1"
         placeholder="请选择用户状态"
       ></ProFormSelect>
-    </ModalForm>
+    </ModalForm>}
   </PageContainer>
 }
 

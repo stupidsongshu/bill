@@ -14,7 +14,8 @@ export async function rule(
   },
   options?: { [key: string]: any },
 ) {
-  return request<{
+  console.log('rule GET req:', params)
+  const res = await request<{
     data: TableListItem[];
     /** 列表的内容总数 */
     total?: number;
@@ -26,6 +27,8 @@ export async function rule(
     },
     ...(options || {}),
   });
+  console.log('rule GET res:', res)
+  return res
 }
 
 /** 新建规则 PUT /api/rule */
