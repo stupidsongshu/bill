@@ -51,4 +51,5 @@ export default {
   'menu.editor.koni': '拓扑编辑器',
 
   'menu.list.user-list': '用户列表',
+  'menu.list.category-list': '分类列表',
 };

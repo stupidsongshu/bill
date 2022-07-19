@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const CategoryService = require('../services/category')
 const Util = require('../utils')
 
@@ -50,6 +51,39 @@ exports.bulkCreate = async (req, res, next) => {
   } catch (error) {
     // console.error('CategoryModel bulkCreate error:', error)
     // next(error)
+    Util.handleApiError(error, res, next)
+  }
+}
+
+exports.list = async (req, res, next) => {
+  const { query: body } = req
+  const id = Util.getParam(body, 'id', null)
+  const name = Util.getParam(body, 'name', '')
+  const type = Util.getParam(body, 'type', -1)
+  const status = Util.getParam(body, 'status', -1)
+
+  const where = {}
+  if (id && id > 0) {
+    where.id = { [Op.eq]: id }
+  }
+  if (name) {
+    where.name = { [Op.like]: name }
+  }
+  if (type !== -1) {
+    where.type = { [Op.eq]: type }
+  }
+  if (status !== -1) {
+    where.status = { [Op.eq]: status }
+  }
+
+  try {
+    const ret = await CategoryService.getList(where)
+    // if (ret.length > 0) {
+    //   return Util.success(res, ret)
+    // }
+    // return Util.none(res)
+    return Util.success(res, ret)
+  } catch (error) {
     Util.handleApiError(error, res, next)
   }
 }

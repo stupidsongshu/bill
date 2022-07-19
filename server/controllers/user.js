@@ -31,6 +31,7 @@ exports.bulkCreate = async (req, res, next) => {
 // 查询列表
 exports.list = async (req, res, next) => {
   const { query: body = {} } = req
+  const id = Util.getParam(body, 'id', null)
   const phone = Util.getParam(body, 'phone', null)
   const status = Util.getParam(body, 'status', -1)
 
@@ -38,6 +39,9 @@ exports.list = async (req, res, next) => {
   const sort = Util.getParam(body, 'sort', 'asc')
 
   const where = {}
+  if (id && id > 0) {
+    where.id = { [Op.eq]: id }
+  }
   if (phone) {
     where.phone = { [Op.eq]: phone }
   }

@@ -27,7 +27,8 @@ router
   .post('/user/save', userCtrl.save) // 新增
   .put('/user/save', userCtrl.save) // 更新
   .delete('/user/delete', userCtrl.delete) // 删除
-
+  
   .post('/category/bulkCreate', categoryCtrl.bulkCreate)
+  .get('/category/list', categoryCtrl.list)
 
 module.exports = router

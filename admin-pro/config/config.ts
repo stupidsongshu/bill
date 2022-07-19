@@ -186,6 +186,12 @@ export default defineConfig({
           path: '/list/user',
           component: './list/user-list'
         },
+        {
+          name: 'category-list',
+          icon: 'smile',
+          path: '/list/category',
+          component: './list/category-list'
+        }
       ],
     },
     {

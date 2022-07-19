@@ -36,7 +36,7 @@ async function handleSave(fields: TableListItem, currentRow?: TableListItem): Pr
 const UserList: FC = () => {
   const actionRef= useRef<ActionType>()
   const [currentRow, setCurrentRow] = useState<TableListItem>()
-  const [createModalVisible, handleModalVisible] = useState<boolean>(false)
+  const [modalVisible, handleModalVisible] = useState<boolean>(false)
 
   const columns: ProColumns<TableListItem>[] = [
     {
@@ -79,6 +79,7 @@ const UserList: FC = () => {
     {
       dataIndex: 'email',
       title: '邮箱',
+      copyable: true
     },
     {
       dataIndex: 'status',
@@ -138,13 +139,13 @@ const UserList: FC = () => {
       request={getUserPageList}>
     </ProTable>
 
-    {!createModalVisible ? null : <ModalForm
+    {!modalVisible ? null : <ModalForm
       title={currentRow && currentRow.id ? '编辑' : '新建'}
       width={500}
       layout="horizontal"
       labelCol={{span: 4}}
       wrapperCol={{span: 20}}
-      visible={createModalVisible}
+      visible={modalVisible}
       onVisibleChange={onVisibleChange}
       onFinish={async (values) => {
         const success = await handleSave(values as TableListItem, currentRow)
@@ -157,7 +158,8 @@ const UserList: FC = () => {
         }
       }}
       initialValues={{
-        status: '1',
+        // status: '1',
+        status: 1, // 使用了 convertValue 后可以不用特别写为字符串
         ...currentRow
       }}
       >
