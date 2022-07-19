@@ -30,5 +30,6 @@ router
   
   .post('/category/bulkCreate', categoryCtrl.bulkCreate)
   .get('/category/list', categoryCtrl.list)
+  .post('/category/save', categoryCtrl.save)
 
 module.exports = router

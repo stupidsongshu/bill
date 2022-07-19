@@ -87,3 +87,40 @@ exports.list = async (req, res, next) => {
     Util.handleApiError(error, res, next)
   }
 }
+
+exports.save = async (req, res, next) => {
+  const { body } = req
+  const id = Util.getParam(body, 'id', null)
+  const name = Util.getParam(body, 'name', '')
+  const type = Util.getParam(body, 'type', -1)
+  const status = Util.getParam(body, 'status', 1)
+
+  if (!name) {
+    return Util.paramErr('缺少参数：id')
+  }
+  if (![0, 1, 2].includes(type)) {
+    return Util.paramErr('缺少参数：type')
+  }
+
+  let data = {
+    id,
+    name,
+    type,
+    status
+  }
+
+  if (id && id > 0) {
+    const model = await CategoryService.getByPk(id)
+    if (model === null) {
+      return Util.paramErr('该记录不存在')
+    }
+    data = Util.deepMerge({}, model.dataValues, data)
+  }
+
+  try {
+    const ret = await CategoryService.save(data)
+    Util.success(res, ret)
+  } catch (error) {
+    Util.handleApiError(error, res, next)
+  }
+}
