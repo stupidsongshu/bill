@@ -5,14 +5,14 @@ type ValueEnum = {
   }
 }
 
-export function getSelectValueEnum(valueEnum: ValueEnum) {
+function getStatusEnum(valueEnum: ValueEnum) {
   return Object.keys(valueEnum).reduce((prev, curr) => {
     prev[curr] = valueEnum[curr].text
     return prev
   }, {})
 }
 
-export const statusEnum = {
+export const statusColumnValueEnum: ValueEnum = {
   0: {
     text: '无效',
     status: 'Error'
@@ -22,3 +22,5 @@ export const statusEnum = {
     status: 'Success'
   }
 }
+
+export const statusValueEnum = getStatusEnum(statusColumnValueEnum)

@@ -8,9 +8,7 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table'
 import { ModalForm, ProFormSelect, ProFormText } from '@ant-design/pro-form'
 import type { TableListItem, TableListParams } from './data'
 import { getUserPageList, addUser, updateUser } from './service'
-import { statusEnum, getSelectValueEnum } from '../../../utils/enum'
-
-const statusSelectValueEnum = getSelectValueEnum(statusEnum)
+import { statusColumnValueEnum, statusValueEnum } from '../../../utils/enum'
 
 async function handleSave(fields: TableListItem, currentRow?: TableListItem): Promise<boolean> {
   const data = { ...currentRow, ...fields }
@@ -86,7 +84,7 @@ const UserList: FC = () => {
       dataIndex: 'status',
       title: '状态',
       valueType: 'select',
-      valueEnum: statusEnum,
+      valueEnum: statusColumnValueEnum,
     },
     {
       dataIndex: 'option',
@@ -172,7 +170,7 @@ const UserList: FC = () => {
         ]}
       >
       </ProFormText>
-      { currentRow && currentRow.id ? null :
+      {/* { currentRow && currentRow.id ? null :
         <>
           <ProFormText.Password
             label="密码"
@@ -184,7 +182,7 @@ const UserList: FC = () => {
           </ProFormText.Password>
           <ProFormText label="手机号" name="phone" width="md"></ProFormText>
         </>
-      }
+      } */}
       <ProFormText label="邮箱" name="email" width="md"></ProFormText>
       <ProFormSelect
         label="状态"
@@ -195,7 +193,7 @@ const UserList: FC = () => {
           // convertValue 发生在组件获得数据之前，一般是后端直接给前端的数据，有时需要精加工一下。
           return val.toString()
         }}
-        valueEnum={statusSelectValueEnum}
+        valueEnum={statusValueEnum}
         placeholder="请选择用户状态"
       ></ProFormSelect>
     </ModalForm>}
